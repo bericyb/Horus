@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <title>Horus</title>
+        <link rel="icon" href="1920px-Eye_of_Horus_bw.svg.png">
+    </head>
+    <body>
+        <h1 id="head">The Eye of Horus</h1>
+
+        <p></p>
+
+        <canvas id="canvas" style="border:1px solid #000000;" width="1080" height="1080"></canvas>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            var mainArray;
+            var socket = io();
+            const canvas = document.getElementById("canvas");
+            const ctx = canvas.getContext("2d");
+            socket.on('new pixel', (msg) => {
+                var imageData = ctx.createImageData(1080,1080)
+                changePixel(msg.pixel, msg.value);
+                imageData.data.set(mainArray);
+                ctx.putImageData(imageData, 0, 0)
+            });
+            socket.on("current image", (msg) => {
+                mainArray = Uint8ClampedArray.from(msg.pixelArray);
+                var imageData = new ImageData(mainArray, 1080)
+                ctx.putImageData(imageData,0 ,0);
+            });
+
+            function changePixel(position, value) {
+                mainArray[position * 4] = value;
+                mainArray[position * 4 + 1] = value;
+                mainArray[position * 4 + 2] = value;
+                mainArray[position * 4 + 3] = 255;
+            }            
+        </script>
+    </body>
+</html>
